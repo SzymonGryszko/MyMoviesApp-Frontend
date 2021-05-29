@@ -8,10 +8,20 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Vuelidate from 'vuelidate'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 library.add(faUserSecret);
 
+//API 
 Vue.use(Vuelidate);
+Vue.use(VueAxios, axios)
+Vue.prototype.$api = 'https://localhost:44330/api/movies'
+
+//Toast
+Vue.use(VueToast);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
