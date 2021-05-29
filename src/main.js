@@ -13,6 +13,7 @@ import VueAxios from 'vue-axios'
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
+
 library.add(faUserSecret);
 
 //API 
@@ -22,6 +23,9 @@ Vue.prototype.$api = 'https://localhost:44330/api/movies'
 
 //Toast
 Vue.use(VueToast);
+
+//Vuelidate
+Vue.use(Vuelidate);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
