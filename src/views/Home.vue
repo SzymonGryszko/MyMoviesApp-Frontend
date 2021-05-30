@@ -1,13 +1,21 @@
 <template>
   <div class="container">
-    <Modal v-show="isModalVisible" :propsMovie="movie" @close="closeModal" @click="openNewModal()"/>
+    <Modal
+      v-show="isModalVisible"
+      :propsMovie="movie"
+      :isAddMode="this.isAddMode"
+      :isViewMode="this.isViewMode"
+      :isEditMode="this.isEditMode"
+      @close="closeModal"
+
+    />
     <div class="row mt-5 d-flex justify-content-center">
       <div class="col-md-12" v-if="!isLoading && !isFailedToFetchData">
         <div class="card">
           <div class="card-header d-flex justify-content-between">
             <h3 class="card-title">Movies Table</h3>
             <div class="card-tools">
-              <button class="btn btn-success" type="button" @click="showModal">
+              <button class="btn btn-success" type="button" @click="openAddModeModal()">
                 Add New
               </button>
             </div>
@@ -26,11 +34,11 @@
                   <td>{{ movie.title }}</td>
 
                   <td>
-                    <a href="#" @click="viewMovieDetails(movie)">
+                    <a href="#" @click="openViewModeModal(movie)">
                       <i class="fas fa-info-circle yellow"></i>
                     </a>
                     /
-                    <a href="#" @click="editMovie(movie)">
+                    <a href="#" @click="openEditModeModal(movie)">
                       <i class="fa fa-edit blue"></i>
                     </a>
                     /
@@ -49,11 +57,12 @@
         <img :src="loadingImage" class="w-24 m-auto" />
       </div>
       <div v-if="isFailedToFetchData" class="d-flex flex-column">
-        <div class="font-weight-bold">Failed to connect to the server. Try again later!</div>
+        <div class="font-weight-bold">
+          Failed to connect to the server. Try again later!
+        </div>
       </div>
     </div>
   </div>
-  
 </template>
 
 <script>
@@ -71,12 +80,14 @@ export default {
 
   data() {
     return {
-      movie:{},
+      movie: {},
       isModalVisible: false,
       isLoading: true,
       isFailedToFetchData: false,
       loadingImage: require("../assets/hourglass.gif"),
-      editmode: false,
+      isEditMode: false,
+      isViewMode: false,
+      isAddMode: false,
       movies: {},
     };
   },
@@ -128,14 +139,25 @@ export default {
     },
     closeModal() {
       this.isModalVisible = false;
+      this.isEditMode = false,
+      this.isViewMode = false,
+      this.isAddMode = false;
     },
-    viewMovieDetails(movie) {
+    openViewModeModal(movie) {
+      this.isViewMode = true;
       this.movie = movie;
       this.showModal();
     },
-    openNewModal() {
+    openAddModeModal() {
+      this.isAddMode = true;
       this.movie = null;
-    }
+      this.showModal();
+    },
+    openEditModeModal(movie) {
+      this.isEditMode = true;
+      this.movie = movie;
+      this.showModal();
+    },
   },
 };
 </script>
