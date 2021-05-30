@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <Modal v-show="isModalVisible" @close="closeModal" />
+    <Modal v-show="isModalVisible" :propsMovie="movie" @close="closeModal" @click="openNewModal()"/>
     <div class="row mt-5 d-flex justify-content-center">
-      <div class="col-md-12" v-if="!loading">
+      <div class="col-md-12" v-if="!isLoading && !isFailedToFetchData">
         <div class="card">
           <div class="card-header d-flex justify-content-between">
             <h3 class="card-title">Movies Table</h3>
@@ -44,12 +44,16 @@
           </div>
         </div>
       </div>
-      <div v-else class="d-flex flex-column">
+      <div v-if="isLoading" class="d-flex flex-column">
         <div class="font-weight-bold">Fetching Data</div>
         <img :src="loadingImage" class="w-24 m-auto" />
       </div>
+      <div v-if="isFailedToFetchData" class="d-flex flex-column">
+        <div class="font-weight-bold">Failed to connect to the server. Try again later!</div>
+      </div>
     </div>
   </div>
+  
 </template>
 
 <script>
@@ -64,10 +68,13 @@ export default {
   mounted() {
     this.getAllMovies();
   },
+
   data() {
     return {
+      movie:{},
       isModalVisible: false,
-      loading: true,
+      isLoading: true,
+      isFailedToFetchData: false,
       loadingImage: require("../assets/hourglass.gif"),
       editmode: false,
       movies: {},
@@ -79,9 +86,12 @@ export default {
         .get(this.$api)
         .then((response) => {
           this.movies = response.data;
-          this.loading = false;
+          this.isLoading = false;
+          this.isFailedToFetchData = false;
         })
         .catch((error) => {
+          this.isLoading = false;
+          this.isFailedToFetchData = true;
           this.$toast.open({
             message: error,
             type: "error",
@@ -119,6 +129,13 @@ export default {
     closeModal() {
       this.isModalVisible = false;
     },
+    viewMovieDetails(movie) {
+      this.movie = movie;
+      this.showModal();
+    },
+    openNewModal() {
+      this.movie = null;
+    }
   },
 };
 </script>
