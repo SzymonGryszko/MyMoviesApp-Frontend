@@ -47,11 +47,32 @@
               @submit.prevent="isEditMode ? updateMovie() : createNewMovie()"
             >
               <div class="form-group">
-                <label for="firstName">First Name</label>
-                <input type="text" />
+                <label for="Title">Title</label>
+                <input
+                  class="full"
+                  v-model="$v.form.title.$model"
+                  type="text"
+                />
+                <p class="error" v-if="!$v.form.title.required">
+                  this field is required
+                </p>
+                <p class="error" v-if="!$v.form.title.maxLength">
+                  Field can have maximum of
+                  {{ $v.form.title.$params.maxLength.max }} characters.
+                </p>
               </div>
-              <label for="firstName">Year of Production</label>
-              <input type="number" />
+              <div class="form-group">
+                <label for="yearOfProduction">Year of Production</label>
+                <input
+                  type="number"
+                  v-model.lazy="$v.form.yearOfProduction.$model"
+                />
+                <p class="error" v-if="!$v.form.yearOfProduction.between">
+                  value should be between
+                  {{ $v.form.yearOfProduction.$params.between.min }} and
+                  {{ $v.form.yearOfProduction.$params.between.max }}
+                </p>
+              </div>
               <div class="modal-footer">
                 <button
                   type="button"
@@ -78,6 +99,8 @@
 </template>
 
 <script>
+import { required, maxLength, between } from "vuelidate/lib/validators";
+
 export default {
   name: "Modal",
   props: {
@@ -94,11 +117,12 @@ export default {
       },
     };
   },
-  //   validations: {
-  //     movie: {
-  //       title: { required, max: maxLength(200) },
-  //       yearOfProduction: {},
-  //     },
+  validations: {
+    form: {
+      title: { required, maxLength: maxLength(200) },
+      yearOfProduction: { between: between(1900, 2100) },
+    },
+  },
   methods: {
     close() {
       this.$emit("close");
@@ -108,10 +132,15 @@ export default {
       if (this.$v.form.$error) return;
     },
     updateMovie() {
-      console.log('update')
+      console.log("update");
     },
     createNewMovie() {
-      console.log('create')
+      this.formTouched = !this.$v.form.$anyDirty;
+      this.hasFormErrors = this.$v.form.$anyError;
+      if (this.hasFormErrors === false && this.formTouched === false) {
+        //axios call to save a movie
+        console.log("save");
+      }
     },
   },
 };
@@ -119,5 +148,8 @@ export default {
 <style>
 .modal-backdrop {
   opacity: 0.8 !important;
+}
+.error {
+  color: red;
 }
 </style>
