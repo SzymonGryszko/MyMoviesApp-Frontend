@@ -35,15 +35,15 @@
 
                   <td>
                     <a href="#" @click="openViewModeModal(movie)">
-                      <i class="fas fa-info-circle yellow"></i>
+                      <i class="fas fa-info-circle"></i>
                     </a>
                     /
                     <a href="#" @click="openEditModeModal(movie)">
-                      <i class="fa fa-edit blue"></i>
+                      <i class="fa fa-edit"></i>
                     </a>
                     /
                     <a href="#" @click="deleteMovie(movie)">
-                      <i class="fa fa-trash red"></i>
+                      <i class="fa fa-trash"></i>
                     </a>
                   </td>
                 </tr>
