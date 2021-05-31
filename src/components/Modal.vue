@@ -12,7 +12,7 @@
             class="close"
             data-dismiss="modal"
             aria-label="Close"
-            @click="close"
+            @click="closeModal"
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -35,7 +35,7 @@
                   type="button"
                   class="btn btn-secondary"
                   data-dismiss="modal"
-                  @click="close"
+                  @click="closeModal"
                 >
                   Close
                 </button>
@@ -47,13 +47,19 @@
               @submit.prevent="isEditMode ? updateMovie() : createNewMovie()"
             >
               <div class="form-group">
-                <label for="Title">Title</label>
+                <label for="fTitle">Title</label>
                 <input
-                  class="full"
+                  id="fTitle"
+                  class="full w-100"
+                  aria-describedby="error-title"
                   v-model="$v.form.title.$model"
                   type="text"
                 />
-                <p class="error" v-if="!$v.form.title.required">
+                <p
+                  id="error-title"
+                  class="error"
+                  v-if="!$v.form.title.required"
+                >
                   this field is required
                 </p>
                 <p class="error" v-if="!$v.form.title.maxLength">
@@ -62,12 +68,19 @@
                 </p>
               </div>
               <div class="form-group">
-                <label for="yearOfProduction">Year of Production</label>
+                <label for="fYearOfProduction">Year of Production</label>
                 <input
+                  id="fYearOfProduction"
+                  aria-describedby="error-yearOfProduction"
+                  class="w-100"
                   type="number"
                   v-model.lazy="$v.form.yearOfProduction.$model"
                 />
-                <p class="error" v-if="!$v.form.yearOfProduction.between">
+                <p
+                  id="error-yearOfProduction"
+                  class="error"
+                  v-if="!$v.form.yearOfProduction.between"
+                >
                   value should be between
                   {{ $v.form.yearOfProduction.$params.between.min }} and
                   {{ $v.form.yearOfProduction.$params.between.max }}
@@ -78,7 +91,7 @@
                   type="button"
                   class="btn btn-secondary"
                   data-dismiss="modal"
-                  @click="close"
+                  @click="closeModal"
                 >
                   Close
                 </button>
@@ -86,6 +99,7 @@
                   v-if="isAddMode || isEditMode"
                   type="submit"
                   class="btn btn-primary"
+                  :disabled="$v.form.$invalid"
                 >
                   {{ isAddMode ? "Save" : "Save Changes" }}
                 </button>
@@ -100,6 +114,7 @@
 
 <script>
 import { required, maxLength, between } from "vuelidate/lib/validators";
+import axios from "axios";
 
 export default {
   name: "Modal",
@@ -124,7 +139,7 @@ export default {
     },
   },
   methods: {
-    close() {
+    closeModal() {
       this.$emit("close");
     },
     submit() {
@@ -139,7 +154,30 @@ export default {
       this.hasFormErrors = this.$v.form.$anyError;
       if (this.hasFormErrors === false && this.formTouched === false) {
         //axios call to save a movie
-        console.log("save");
+        axios
+          .post(this.$api, {
+            title: this.form.title,
+            yearOfProduction: this.form.yearOfProduction,
+          })
+          .then(() => {
+            //display toast and close modal
+            this.$toast.open({
+              message: "Movie saved",
+              type: "success",
+              position: "top-right",
+              duration: 3000,
+            });
+            this.closeModal();
+          })
+          .catch((error) => {
+            this.$toast.open({
+              message: error,
+              type: "error",
+              position: "top-right",
+              duration: 8000,
+            });
+            this.closeModal();
+          });
       }
     },
   },
@@ -151,5 +189,6 @@ export default {
 }
 .error {
   color: red;
+  font-size: 12px;
 }
 </style>

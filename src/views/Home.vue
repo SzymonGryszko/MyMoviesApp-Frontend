@@ -139,9 +139,10 @@ export default {
     },
     closeModal() {
       this.isModalVisible = false;
-      this.isEditMode = false,
-      this.isViewMode = false,
+      this.isEditMode = false;
+      this.isViewMode = false;
       this.isAddMode = false;
+      this.getAllMovies();
     },
     openViewModeModal(movie) {
       this.isViewMode = true;
