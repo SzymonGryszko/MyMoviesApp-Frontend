@@ -47,13 +47,14 @@
               @submit.prevent="isEditMode ? updateMovie() : createNewMovie()"
             >
               <div class="form-group">
-                <label for="fTitle">Title</label>
+                <label for="fTitle">{{ isAddMode ? "Title" : "Updated Title" }}</label>
                 <input
                   id="fTitle"
                   class="full w-100"
                   aria-describedby="error-title"
                   v-model="$v.form.title.$model"
                   type="text"
+                  :placeholder="this.isEditMode ? this.propsMovie.title : ''"
                 />
                 <p
                   id="error-title"
@@ -68,13 +69,14 @@
                 </p>
               </div>
               <div class="form-group">
-                <label for="fYearOfProduction">Year of Production</label>
+                <label for="fYearOfProduction">{{ isAddMode ? "Year of Production" : "Updated Year of Production" }}</label>
                 <input
                   id="fYearOfProduction"
                   aria-describedby="error-yearOfProduction"
                   class="w-100"
                   type="number"
                   v-model.lazy="$v.form.yearOfProduction.$model"
+                  :placeholder="this.isEditMode ? this.propsMovie.yearOfProduction : null"
                 />
                 <p
                   id="error-yearOfProduction"
@@ -127,7 +129,7 @@ export default {
   data() {
     return {
       form: {
-        title: "",
+        title:'',
         yearOfProduction: null,
       },
     };
@@ -139,15 +141,42 @@ export default {
     },
   },
   methods: {
+    //close modal
     closeModal() {
+      this.form.title = '';
+      this.form.yearOfProduction = null;
       this.$emit("close");
     },
-    submit() {
-      this.$v.form.$touch();
-      if (this.$v.form.$error) return;
-    },
     updateMovie() {
-      console.log("update");
+      this.formTouched = !this.$v.form.$anyDirty;
+      this.hasFormErrors = this.$v.form.$anyError;
+      if (this.hasFormErrors === false && this.formTouched === false) {
+        //axios call to update the movie
+        axios
+          .patch(this.$api + `/${this.propsMovie.id}`, {
+            title: this.form.title,
+            yearOfProduction: this.form.yearOfProduction,
+          })
+          .then(() => {
+            //display toast and close modal
+            this.$toast.open({
+              message: "Movie updated",
+              type: "success",
+              position: "top-right",
+              duration: 3000,
+            });
+            this.closeModal();
+          })
+          .catch((error) => {
+            this.$toast.open({
+              message: error,
+              type: "error",
+              position: "top-right",
+              duration: 8000,
+            });
+            this.closeModal();
+          });
+      }
     },
     createNewMovie() {
       this.formTouched = !this.$v.form.$anyDirty;
