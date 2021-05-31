@@ -141,7 +141,7 @@ export default {
     },
   },
   methods: {
-    //close modal
+    //close modal and clear form
     closeModal() {
       this.form.title = '';
       this.form.yearOfProduction = null;
